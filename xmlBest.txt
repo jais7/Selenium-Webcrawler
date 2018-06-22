@@ -1,0 +1,156 @@
+package xmlTest;
+
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class xmlTest {
+
+	
+	public static void main(String[] args) {
+		System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+	    // Getting the initial page
+	    driver.get("https://www.tripadvisor.com");
+	    driver.manage().timeouts().implicitlyWait(100, TimeUnit.SECONDS);
+	    driver.findElement(By.xpath("//*[@id=\"taplc_masthead_search_0\"]/div/span[1]"))
+	    		.click();
+	    //driver.findElement(By.xpath("//*[@id=\"taplc_masthead_search_0\"]/div/span[1]"))
+		//.click(); //Another way
+	    WebElement element = driver.findElement(By.xpath("//*[@id=\"mainSearch\"]"));
+	    element.sendKeys("Fishing Texas");
+	    WebElement element2 = driver.findElement(By.xpath("//*[@id=\"GEO_SCOPED_SEARCH_INPUT\"]"));
+	    element2.sendKeys("Worldwide");
+	    driver.manage().timeouts().implicitlyWait(300, TimeUnit.SECONDS);
+	    driver.findElement(By.xpath("//*[@id=\"SEARCH_BUTTON\"]")).click();
+	    
+	    String title = null; 
+	    String info = null;
+	    String tags = null;
+	    String address = null;
+	    String hours = null;
+	    String phone = null;
+	    String review = null;
+	    String imageSource = null;
+	    URL imageURL = null;
+	    
+	    WebElement element4 = driver.findElement(By.xpath("//*[@id=\"search_result\"]/div/div[2]/div[1]/div[1]/div[1]/div[1]/div/div/div/a/div/img")); //Finding image
+	    
+	    String elementsrc = element4.getAttribute("src"); //Getting source att for the img
+	    
+	    System.out.println(elementsrc);
+
+	    driver.findElement(By.xpath("//*[@id=\"search_result\"]/div/div[1]/div[1]")).click();//first result
+	    //driver.findElement(By.xpath("//*[@id=\"search_result\"]/div/div[2]/div[1]/div[1]")).click();//Second result page where there is a bug (FIXED)
+
+	    
+	    ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
+	    driver.switchTo().window(tabs.get(1)); //Switching to the next tab.
+	    
+	    driver.manage().timeouts().implicitlyWait(1000, TimeUnit.MILLISECONDS); //If else won't work without implicit wait.
+
+	    if(!driver.findElements(By.xpath("//*[@id=\"HEADING\"]")).isEmpty()) {
+		    title = driver.findElement(By.xpath("//*[@id=\"HEADING\"]")).getText();
+	    }
+	    else {
+	    	 System.out.println("Title is missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_location_detail_overview_attraction_0\"]/div[1]/div[2]/div[2]/div[1]/div[1]/div/div[1]")).isEmpty()) {
+	    	info = driver.findElement(By.xpath("//*[@id=\"taplc_location_detail_overview_attraction_0\"]/div[1]/div[2]/div[2]/div[1]/div[1]/div/div[1]")).getText();
+	    }else {
+	    	 System.out.println("Info is missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[1]/span[3]/div")).isEmpty()) {
+	    	tags = driver.findElement(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[1]/span[3]/div")).getText();
+	    }else {
+	    	 System.out.println("Tags are missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[2]/div/div[1]/span[3]")).isEmpty()) {
+	    	address = driver.findElement(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[2]/div/div[1]/span[3]")).getText();
+	    }else {
+	    	 System.out.println("Address is missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_attraction_detail_listing_0\"]/div[1]/div/div[2]/div")).isEmpty()) {
+	    	hours = driver.findElement(By.xpath("//*[@id=\"taplc_attraction_detail_listing_0\"]/div[1]/div/div[2]/div")).getText();
+	    }else {
+	    	System.out.println("Hours of operation missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[2]/div/div[2]/span[2]")).isEmpty()) {
+	    	phone = driver.findElement(By.xpath("//*[@id=\"taplc_location_detail_header_attractions_0\"]/div[2]/div/div[2]/span[2]")).getText();
+	    }else {
+	    	System.out.println("Phone info is missing");
+	    }
+	    if(!driver.findElements(By.xpath("//*[@id=\"taplc_location_detail_review_highlight_attractions_0\"]/div/div[2]/div/div[2]/div/div")).isEmpty()) {
+	    	review = driver.findElement(By.xpath("//*[@id=\"taplc_location_detail_review_highlight_attractions_0\"]/div/div[2]/div/div[2]/div/div")).getText();
+	    }else {
+	    	System.out.println("Review is missing");
+	    }
+
+	    System.out.println(title);
+	    System.out.println(info + "\n");
+	    System.out.println(tags + "\n");
+	    System.out.println(address + "\n");
+		System.out.println(hours + "\n");
+	    System.out.println(phone + "\n");
+	  	System.out.println(review + "\n");
+	  	System.out.println(elementsrc + "\n");
+	  	
+
+	    Writer writer = null;
+	    
+	    try {
+	        //generate url
+	        imageURL = new URL(elementsrc);
+
+	        //read url and retrieve image
+	        BufferedImage saveImage = ImageIO.read(imageURL);
+
+	        //download image to the workspace where the project is, save picture as picture.png (can be changed)
+	        ImageIO.write(saveImage, "png", new File(title + ".png"));
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+
+	    try {
+	        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(title + ".xml"), "utf-8"));
+	        writer.write("<ServiceProvider " + "serviceProviderName=" + "\"" + title + "\"" + ">" + "\n");
+	        writer.write("\t" + "<location>" + address + "</location>" + "\n");
+	        writer.write("\t" + "<summaryDescription>" + info + "</summaryDescription>" + "\n");
+	        writer.write("\t" + "<Gallery>" + "\n" + "\t" + "<Image>" + elementsrc + "</Image>" + "\n" + "\t" +"</Gallery>" + "\n");
+	        writer.write("\t" + "<categoryTags>" + tags + "</categoryTags>" + "\n");
+	        writer.write("\t" + "<hours>" + hours + "</hours>" +  "\n");
+	        writer.write("\t" + "<phone>" + phone + "</phone>" + "\n");
+	        writer.write("\t" + "<review>" + review + "</review>" + "\n" + "</ServiceProvider>"); 
+	    } catch (IOException ex) {
+	      // report
+	    } finally {
+	       try {writer.close();} catch (Exception ex) {
+	    	   //ignore
+	    	   }
+	       }
+	    }
+
+	}
